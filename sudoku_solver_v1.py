@@ -1,3 +1,5 @@
+import copy
+
 
 # example sudoku 
 example_board = [
@@ -9,7 +11,7 @@ example_board = [
         [2, -1, 6,   -1, -1, 3,   -1, -1, -1],
         [-1, -1, -1,   -1, -1, -1,   -1, -1, 4],
 
-        [5, -1, -1,   -1, -1, -1,   -1, -1, -1],
+        [5, -1, -1,   -1, -1, -1,   -1, -1, -1], 
         [6, 7, -1,   1, -1, 5,   -1, 4, -1],
         [1, -1, 9,   -1, -1, -1,   2, -1, -1]
     ]
@@ -26,12 +28,13 @@ example_board = [
 rows = 9
 cols = 9 
 
-def find_empty():
+def find_empty(board):
     for row in range(rows):
         for col in range(cols):
-            if example_board[row][col] == -1:
+            if board[row][col] == -1:
                 empty_spot = (row, col)
                 return empty_spot
+    return False
     
 
 square_1 = [(0,0), (0,1), (0,2),  (1,0), (1,1), (1,2),  (2,0), (2,1), (2,2)]
@@ -53,18 +56,18 @@ square_8 = [(7,4), (7,5), (7,6),  (8,4), (8,5), (8,6),  (9,4), (9,5), (9,6)]
 square_9 = [(7,7), (7,8), (7,9),  (8,7), (8,8), (8,9),  (9,7), (9,8), (9,9)]
 
 
-def is_valid(empty_spot, num): 
+def is_valid(board, empty_spot, num): 
     row, col = empty_spot
 
     # check row
-    if num in example_board[row]: 
+    if num in board[row]: 
         return False
 
     # colum
     col_list = []
     col_list.clear()
     for row in range(rows):
-        col_list.append(example_board[row][col])
+        col_list.append(board[row][col])
 
     # check col
     if num in col_list: 
@@ -96,28 +99,32 @@ def is_valid(empty_spot, num):
     square_list.clear()
     for elements in square:
         r, c = elements
-        square_list.append(example_board[r][c])
+        square_list.append(board[r][c])
 
     # check 3x3
     if num in square_list:
         return False
     return True 
 
+
 def recursive_solving():
-    pass
-    # get empty spot
+    empty_spot = find_empty(board_copy)
+    row, col = empty_spot
     # set num in empty spot
-    # chech validation 
-        # False
-            # new number/spot
-        # True
-            # new number for next spot
-    # final solution
-        # False
-            # there are still empty spots
-            # go back ...???
-        # True
-            # all valid and no empty spots
+    for num in range(10): # number from 1-9 
+        if is_valid(board_copy, empty_spot, num) == True:
+            board_copy[row][col] = num
+            return True 
+        else: 
+            return False # not valid
+
+while find_empty(board_copy) != False: 
+    board_copy = copy.deepcopy(example_board)
+    if recursive_solving() == True:
+        recursive_solving()
+    elif recursive_solving() == False:
+        # 
+        recursive_solving() # remove the latest move and go a different path
 
 def game(): 
     # intro
@@ -131,3 +138,9 @@ def game():
             break
         else:
             print('The input sudoku is invalid. Please insert again.')
+
+
+    solution = recursive_solving() 
+    print(solution)
+    print('The Sudoku has been solved')
+        
